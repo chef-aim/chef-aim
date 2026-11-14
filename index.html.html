@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChefAim // Kitchen FPS Aim Trainer</title>
+    <!-- Google Fonts: Rajdhani & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-obsidian: #0f1923;
+            --bg-panel: #16222f;
+            --bg-card: #1c2b3a;
+            --border-subtle: rgba(236, 232, 225, 0.14);
+            --val-red: #ff4655;
+            --val-red-hover: #ff5e6b;
+            --val-cyan: #00f0ff;
+            --val-gold: #f5b942;
+            --text-light: #ece8e1;
+            --text-muted: #8b9bb4;
+            --font-display: 'Rajdhani', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-obsidian);
+            color: var(--text-light);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: rgba(15, 25, 35, 0.95);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 30;
+            position: relative;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            background: var(--val-red);
+            clip-path: polygon(15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%, 0% 15%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .brand-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .brand-title span {
+            color: var(--val-red);
+        }
+
+        .brand-sub {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .hud-bar {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            padding: 0.45rem 1.25rem;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .hud-stat {
+            text-align: center;
+            min-width: 68px;
+        }
+
+        .hud-label {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .hud-value {
+            font-family: var(--font-display);
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--text-light);
+            line-height: 1.1;
+        }
+
+        .hud-value.timer {
+            color: var(--val-red);
+        }
+
+        .hud-value.streak {
+            color: var(--val-cyan);
+        }
+
+        .hud-divider {
+            width: 1px;
+            height: 26px;
+            background: var(--border-subtle);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .btn-icon {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-light);
+            padding: 0.55rem 0.85rem;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--val-red);
+            color: #fff;
+            background: rgba(255, 70, 85, 0.12);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 1rem;
+        }
+
+        .arena-wrapper {
+            flex: 1;
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            position: relative;
+            background: radial-gradient(circle at center, #182736 0%, #0b131b 100%);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            min-height: 540px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .corner-bracket {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-color: var(--val-red);
+            border-style: solid;
+            pointer-events: none;
+            z-index: 15;
+        }
+        .cb-tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+        .cb-tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+        .cb-bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+        .cb-br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+        canvas#aimCanvas {
+            width: 100%;
+            height: 100%;
+            flex: 1;
+            display: block;
+            touch-action: none;
+        }
+
+        canvas#aimCanvas.playing,
+        .arena-wrapper.playing {
+            cursor: none !important;
+        }
+
+        #customCrosshair {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            will-change: transform;
+            z-index: 16;
+            display: none;
+            transition: none !important;
+        }
+
+        .ch-part {
+            position: absolute;
+            pointer-events: none;
+            transition: none !important;
+        }
+
+        .overlay-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(11, 19, 27, 0.88);
+            backdrop-filter: blur(8px);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .overlay-screen.hidden {
+            display: none !important;
+        }
+
+        .panel-box {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            width: 100%;
+            max-width: 920px;
+            padding: 2rem;
+            position: relative;
+            clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .panel-tag {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--val-red);
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .panel-title {
+            font-family: var(--font-display);
+            font-size: 2.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            line-height: 1;
+        }
+
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 1.15rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            text-align: left;
+        }
+
+        .mode-card:hover {
+            border-color: rgba(255, 70, 85, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .mode-card.selected {
+            border: 2px solid var(--val-red);
+            background: linear-gradient(145deg, rgba(255, 70, 85, 0.16), var(--bg-card));
+        }
+
+        .mode-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 70, 85, 0.15);
+            color: var(--val-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .mode-card.selected .mode-icon {
+            background: var(--val-red);
+            color: #fff;
+        }
+
+        .mode-name {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.35rem;
+        }
+
+        .mode-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .mode-best {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--val-cyan);
+            letter-spacing: 0.5px;
+        }
+
+        .quick-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(15, 25, 35, 0.6);
+            padding: 1rem 1.25rem;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 1.5rem;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .option-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-right: 0.25rem;
+        }
+
+        .pill-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-light);
+            padding: 0.4rem 0.75rem;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .pill-btn:hover {
+            border-color: var(--val-cyan);
+        }
+
+        .pill-btn.active {
+            background: var(--val-cyan);
+            color: #0b131b;
+            border-color: var(--val-cyan);
+        }
+
+        .btn-play {
+            width: 100%;
+            background: var(--val-red);
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            font-family: var(--font-display);
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn-play:hover {
+            background: var(--val-red-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(255, 70, 85, 0.45);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 260px;
+            gap: 1.5rem;
+        }
+
+        .sliders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .slider-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .slider-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slider-top span:last-child {
+            color: var(--val-cyan);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--bg-card);
+            outline: none;
+            border: 1px solid var(--border-subtle);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--val-red);
+            cursor: pointer;
+        }
+
+        .color-swatches {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .swatch {
+            width: 28px;
+            height: 28px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .swatch.active {
+            border-color: #fff;
+            transform: scale(1.12);
+        }
+
+        .preview-box {
+            background: #0d161f;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        canvas#crosshairPreview {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, #1e3144 0%, #0e1822 100%);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .result-stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .result-stat-val {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+        }
+
+        .result-stat-lbl {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .rank-banner {
+            background: linear-gradient(90deg, rgba(255, 70, 85, 0.18), rgba(0, 240, 255, 0.12));
+            border: 1px solid var(--border-subtle);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .rank-badge-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        #countdownOverlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 18;
+        }
+
+        #countdownText {
+            font-family: var(--font-display);
+            font-size: 6rem;
+            font-weight: 800;
+            color: var(--val-red);
+            text-shadow: 0 0 30px rgba(255, 70, 85, 0.7);
+            letter-spacing: 4px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-wrap: wrap;
+                padding: 0.6rem 1rem;
+            }
+            .hud-bar {
+                order: 3;
+                width: 100%;
+                justify-content: space-around;
+                gap: 0.5rem;
+                padding: 0.4rem 0.5rem;
+            }
+            .hud-stat {
+                min-width: 52px;
+            }
+            .hud-value {
+                font-size: 1.2rem;
+            }
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            .panel-box {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-logo">C</div>
+            <div>
+                <div class="brand-title">CHEF<span>AIM</span></div>
+                <span class="brand-sub">Culinary Reflex Range</span>
+            </div>
+        </div>
+
+        <div class="hud-bar">
+            <div class="hud-stat">
+                <span class="hud-label">Score</span>
+                <span class="hud-value" id="hudScore">0</span>
+            </div>
+            <div class="hud-divider"></div>
+            <div class="hud-stat">
+                <span class="hud-label">Time</span>
+                <span class="hud-value timer" id="hudTimer">30.0</span>
+            </div>
+            <div class="hud-divider"></div>
+            <div class="hud-stat">
+                <span class="hud-label">Accuracy</span>
+                <span class="hud-value" id="hudAccuracy">100%</span>
+            </div>
+            <div class="hud-divider"></div>
+            <div class="hud-stat">
+                <span class="hud-label">Streak</span>
+                <span class="hud-value streak" id="hudStreak">0</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-icon" id="btnPointerLock" title="Toggle True FPS Pointer Lock (Raw 1:1 Input)">
+                <i class="fa-solid fa-lock-open" id="pointerLockIcon"></i>
+                <span id="pointerLockLabel">Raw Lock: OFF</span>
+            </button>
+            <button class="btn-icon" id="btnOpenSettings" title="Crosshair & Sensitivity Settings">
+                <i class="fa-solid fa-crosshairs"></i>
+                <span>Crosshair / Sens</span>
+            </button>
+            <button class="btn-icon" id="btnToggleMute" title="Toggle Sound Effects">
+                <i class="fa-solid fa-volume-high" id="muteIcon"></i>
+            </button>
+            <button class="btn-icon" id="btnStopRound" style="display:none;" title="Abort Round (ESC)">
+                <i class="fa-solid fa-stop"></i>
+                <span>Stop</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="arena-wrapper" id="arenaWrapper">
+            <div class="corner-bracket cb-tl"></div>
+            <div class="corner-bracket cb-tr"></div>
+            <div class="corner-bracket cb-bl"></div>
+            <div class="corner-bracket cb-br"></div>
+
+            <canvas id="aimCanvas"></canvas>
+
+            <div id="customCrosshair">
+                <div class="ch-part" id="chTop"></div>
+                <div class="ch-part" id="chBottom"></div>
+                <div class="ch-part" id="chLeft"></div>
+                <div class="ch-part" id="chRight"></div>
+                <div class="ch-part" id="chDot"></div>
+            </div>
+
+            <div id="countdownOverlay" class="hidden">
+                <div id="countdownText">3</div>
+            </div>
+
+            <div class="overlay-screen" id="lobbyScreen">
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <div>
+                            <span class="panel-tag">// Kitchen Prep Range v2.0</span>
+                            <h1 class="panel-title">Select Training Protocol</h1>
+                        </div>
+                        <button class="btn-icon" id="btnLobbySettings">
+                            <i class="fa-solid fa-sliders"></i> Customize Crosshair & Targets
+                        </button>
+                    </div>
+
+                    <div class="modes-grid" id="modesGrid">
+                        <div class="mode-card selected" data-mode="gridshot">
+                            <div class="mode-icon"><i class="fa-solid fa-table-cells"></i></div>
+                            <div class="mode-name">Gridshot</div>
+                            <div class="mode-desc">3 targets active at once. Builds raw flick speed, pathing, and rhythm.</div>
+                            <div class="mode-best">BEST: <span id="best-gridshot">0</span></div>
+                        </div>
+
+                        <div class="mode-card" data-mode="microflick">
+                            <div class="mode-icon"><i class="fa-solid fa-bullseye"></i></div>
+                            <div class="mode-name">Micro-Flick</div>
+                            <div class="mode-desc">Small targets spawn around center crosshair. Trains Valorant micro-adjustments.</div>
+                            <div class="mode-best">BEST: <span id="best-microflick">0</span></div>
+                        </div>
+
+                        <div class="mode-card" data-mode="headshot">
+                            <div class="mode-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+                            <div class="mode-name">One-Tap HS</div>
+                            <div class="mode-desc">Precision headshot orbs with bonus streak multipliers and strict miss penalties.</div>
+                            <div class="mode-best">BEST: <span id="best-headshot">0</span></div>
+                        </div>
+
+                        <div class="mode-card" data-mode="tracking">
+                            <div class="mode-icon"><i class="fa-solid fa-arrows-left-right"></i></div>
+                            <div class="mode-name">Strafe Track</div>
+                            <div class="mode-desc">Hold fire while tracking an erratic AD-strafing target across the range.</div>
+                            <div class="mode-best">BEST: <span id="best-tracking">0</span></div>
+                        </div>
+                    </div>
+
+                    <div class="quick-bar">
+                        <div class="option-group">
+                            <span class="option-label">Duration:</span>
+                            <button class="pill-btn duration-btn" data-duration="15">15s</button>
+                            <button class="pill-btn duration-btn active" data-duration="30">30s</button>
+                            <button class="pill-btn duration-btn" data-duration="60">60s</button>
+                        </div>
+
+                        <div class="option-group">
+                            <span class="option-label">Target Size:</span>
+                            <button class="pill-btn size-btn" data-size="small">Small</button>
+                            <button class="pill-btn size-btn active" data-size="medium">Medium</button>
+                            <button class="pill-btn size-btn" data-size="large">Large</button>
+                        </div>
+
+                        <div class="option-group">
+                            <span class="option-label">Target Color:</span>
+                            <div class="color-swatches" id="targetColorSwatches">
+                                <div class="swatch active" data-color="#ff4655" style="background:#ff4655;" title="Valorant Red"></div>
+                                <div class="swatch" data-color="#00f0ff" style="background:#00f0ff;" title="Cyber Cyan"></div>
+                                <div class="swatch" data-color="#f5b942" style="background:#f5b942;" title="Radiant Gold"></div>
+                                <div class="swatch" data-color="#2ee59d" style="background:#2ee59d;" title="Viper Green"></div>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <span class="option-label">Input Mode:</span>
+                            <button class="pill-btn" id="btnLobbyPointerLock" title="Uses Pointer Lock API for zero OS cursor boundaries & raw delta input">
+                                Pointer Lock: OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-play" id="btnStartGame">
+                        <i class="fa-solid fa-play"></i> Start Practice Round
+                    </button>
+                </div>
+            </div>
+
+            <div class="overlay-screen hidden" id="settingsScreen">
+                <div class="panel-box" style="max-width: 720px;">
+                    <div class="panel-header">
+                        <div>
+                            <span class="panel-tag">// Tactical Reticle & Input</span>
+                            <h2 class="panel-title">Crosshair & Sensitivity</h2>
+                        </div>
+                        <button class="btn-icon" id="btnCloseSettings">
+                            <i class="fa-solid fa-check"></i> Save & Close
+                        </button>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="sliders-list">
+                            <div class="slider-row">
+                                <div class="slider-top">
+                                    <span>Pointer Lock Sensitivity</span>
+                                    <span id="valSensitivity">1.00x</span>
+                                </div>
+                                <input type="range" id="inputSensitivity" min="0.2" max="3.0" step="0.05" value="1.0">
+                            </div>
+
+                            <div class="slider-row">
+                                <div class="slider-top"><span>Reticle Color</span></div>
+                                <div class="color-swatches" id="chColorSwatches">
+                                    <div class="swatch active" data-color="#00f0ff" style="background:#00f0ff;"></div>
+                                    <div class="swatch" data-color="#2ee59d" style="background:#2ee59d;"></div>
+                                    <div class="swatch" data-color="#ffffff" style="background:#ffffff;"></div>
+                                    <div class="swatch" data-color="#ff4655" style="background:#ff4655;"></div>
+                                    <div class="swatch" data-color="#f5b942" style="background:#f5b942;"></div>
+                                </div>
+                            </div>
+
+                            <div class="slider-row">
+                                <div class="slider-top">
+                                    <span>Line Length</span>
+                                    <span id="valChSize">8</span>
+                                </div>
+                                <input type="range" id="chSize" min="2" max="24" value="8">
+                            </div>
+
+                            <div class="slider-row">
+                                <div class="slider-top">
+                                    <span>Line Thickness</span>
+                                    <span id="valChThick">2</span>
+                                </div>
+                                <input type="range" id="chThick" min="1" max="6" value="2">
+                            </div>
+
+                            <div class="slider-row">
+                                <div class="slider-top">
+                                    <span>Center Gap</span>
+                                    <span id="valChGap">4</span>
+                                </div>
+                                <input type="range" id="chGap" min="0" max="16" value="4">
+                            </div>
+
+                            <div class="option-group" style="margin-top: 0.5rem;">
+                                <button class="pill-btn active" id="btnToggleDot">Center Dot: ON</button>
+                                <button class="pill-btn active" id="btnToggleOutline">Outline: ON</button>
+                                <button class="pill-btn" id="btnResetCrosshair">Reset Default</button>
+                            </div>
+                        </div>
+
+                        <div class="preview-box">
+                            <span class="option-label">Live Reticle Preview</span>
+                            <canvas id="crosshairPreview" width="180" height="180"></canvas>
+                            <span style="font-size:0.7rem; color:var(--text-muted); text-align:center;">
+                                Auto-saved to browser storage
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overlay-screen hidden" id="resultsScreen">
+                <div class="panel-box" style="max-width: 780px;">
+                    <div class="panel-header">
+                        <div>
+                            <span class="panel-tag">// Session Debrief</span>
+                            <h2 class="panel-title" id="resultModeTitle">Gridshot Complete</h2>
+                        </div>
+                        <span id="newRecordBadge" style="display:none; background:var(--val-gold); color:#0b131b; font-family:var(--font-display); font-weight:800; padding:0.35rem 0.85rem; letter-spacing:1.5px; text-transform:uppercase;">
+                            <i class="fa-solid fa-crown"></i> New Personal Best!
+                        </span>
+                    </div>
+
+                    <div class="rank-banner">
+                        <div>
+                            <span class="option-label" style="display:block; margin-bottom:2px;">Performance Rating</span>
+                            <div class="rank-badge-title" id="resultRankName" style="color: var(--val-cyan);">ASCENDANT III</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="option-label" style="display:block; margin-bottom:2px;">Personal High Score</span>
+                            <div style="font-family:var(--font-display); font-size:1.5rem; font-weight:700;" id="resultBestScore">0</div>
+                        </div>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-stat-card">
+                            <div class="result-stat-val" id="resScore" style="color:var(--val-red);">0</div>
+                            <div class="result-stat-lbl">Final Score</div>
+                        </div>
+                        <div class="result-stat-card">
+                            <div class="result-stat-val" id="resAccuracy">0%</div>
+                            <div class="result-stat-lbl">Accuracy</div>
+                        </div>
+                        <div class="result-stat-card">
+                            <div class="result-stat-val" id="resKps">0.00</div>
+                            <div class="result-stat-lbl">Hits / Sec</div>
+                        </div>
+                        <div class="result-stat-card">
+                            <div class="result-stat-val" id="resReaction">0ms</div>
+                            <div class="result-stat-lbl">Avg Reaction</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                        <button class="btn-play" id="btnPlayAgain" style="flex:2;">
+                            <i class="fa-solid fa-rotate-right"></i> Play Again
+                        </button>
+                        <button class="btn-icon" id="btnBackToLobby" style="flex:1; justify-content:center; font-size:1.1rem;">
+                            <i class="fa-solid fa-bars"></i> Change Mode
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (() => {
+            class SoundFX {
+                constructor() {
+                    this.ctx = null;
+                    this.muted = false;
+                }
+
+                init() {
+                    if (!this.ctx) {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        this.ctx = new AudioCtx();
+                    }
+                    if (this.ctx.state === 'suspended') {
+                        this.ctx.resume();
+                    }
+                }
+
+                playHit(streak = 1) {
+                    if (this.muted) return;
+                    this.init();
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    const pitchBoost = Math.min(streak * 22, 420);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(520 + pitchBoost, now);
+                    osc.frequency.exponentialRampToValueAtTime(1150 + pitchBoost, now + 0.065);
+
+                    gain.gain.setValueAtTime(0.22, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.085);
+                }
+
+                playHeadshot() {
+                    if (this.muted) return;
+                    this.init();
+                    const now = this.ctx.currentTime;
+                    [1320, 1980].forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now);
+                        gain.gain.setValueAtTime(idx === 0 ? 0.22 : 0.12, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.17);
+                    });
+                }
+
+                playMiss() {
+                    if (this.muted) return;
+                    this.init();
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(145, now);
+                    osc.frequency.exponentialRampToValueAtTime(65, now + 0.09);
+
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.095);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }
+
+                playBeep(final = false) {
+                    if (this.muted) return;
+                    this.init();
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(final ? 880 : 440, now);
+
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (final ? 0.25 : 0.12));
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + (final ? 0.26 : 0.13));
+                }
+            }
+
+            const sfx = new SoundFX();
+
+            const STORAGE_KEY = 'chef_aim_data_v2';
+            const defaultData = {
+                highScores: { gridshot: 0, microflick: 0, headshot: 0, tracking: 0 },
+                settings: {
+                    duration: 30,
+                    size: 'medium',
+                    targetColor: '#ff4655',
+                    sensitivity: 1.0,
+                    pointerLock: false,
+                    chColor: '#00f0ff',
+                    chSize: 8,
+                    chThick: 2,
+                    chGap: 4,
+                    chDot: true,
+                    chOutline: true
+                }
+            };
+
+            let saveData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+            function persistData() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+            }
+
+            let currentMode = 'gridshot';
+            let gameState = 'lobby'; // lobby, countdown, playing, results
+            let timeRemaining = saveData.settings.duration;
+            let timerInterval = null;
+            let score = 0;
+            let shotsFired = 0;
+            let shotsHit = 0;
+            let streak = 0;
+            let bestStreak = 0;
+            let reactionTimes = [];
+            let lastSpawnTime = 0;
+            let targets = [];
+
+            const canvas = document.getElementById('aimCanvas');
+            const ctx = canvas.getContext('2d');
+            const arenaWrapper = document.getElementById('arenaWrapper');
+            const customCrosshair = document.getElementById('customCrosshair');
+
+            let mouseX = 0;
+            let mouseY = 0;
+
+            function resizeCanvas() {
+                const rect = arenaWrapper.getBoundingClientRect();
+                canvas.width = rect.width * window.devicePixelRatio;
+                canvas.height = rect.height * window.devicePixelRatio;
+                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function updateBestScoresUI() {
+                ['gridshot', 'microflick', 'headshot', 'tracking'].forEach(mode => {
+                    const el = document.getElementById(`best-${mode}`);
+                    if (el) el.textContent = saveData.highScores[mode] || 0;
+                });
+            }
+            updateBestScoresUI();
+
+            function updateCrosshairDOMStyles() {
+                const s = saveData.settings;
+                const top = document.getElementById('chTop');
+                const bottom = document.getElementById('chBottom');
+                const left = document.getElementById('chLeft');
+                const right = document.getElementById('chRight');
+                const dot = document.getElementById('chDot');
+
+                const size = s.chSize;
+                const thick = s.chThick;
+                const gap = s.chGap;
+                const color = s.chColor;
+                const outline = s.chOutline;
+                const hasDot = s.chDot;
+
+                const borderStyle = outline ? '1px solid #000' : 'none';
+
+                top.style.width = `${thick}px`;
+                top.style.height = `${size}px`;
+                top.style.left = `${-thick / 2}px`;
+                top.style.top = `${-(gap + size)}px`;
+                top.style.background = color;
+                top.style.border = borderStyle;
+
+                bottom.style.width = `${thick}px`;
+                bottom.style.height = `${size}px`;
+                bottom.style.left = `${-thick / 2}px`;
+                bottom.style.top = `${gap}px`;
+                bottom.style.background = color;
+                bottom.style.border = borderStyle;
+
+                left.style.width = `${size}px`;
+                left.style.height = `${thick}px`;
+                left.style.left = `${-(gap + size)}px`;
+                left.style.top = `${-thick / 2}px`;
+                left.style.background = color;
+                left.style.border = borderStyle;
+
+                right.style.width = `${size}px`;
+                right.style.height = `${thick}px`;
+                right.style.left = `${gap}px`;
+                right.style.top = `${-thick / 2}px`;
+                right.style.background = color;
+                right.style.border = borderStyle;
+
+                if (hasDot) {
+                    dot.style.width = `${Math.max(2, thick)}px`;
+                    dot.style.height = `${Math.max(2, thick)}px`;
+                    dot.style.left = `${-Math.max(2, thick) / 2}px`;
+                    dot.style.top = `${-Math.max(2, thick) / 2}px`;
+                    dot.style.background = color;
+                    dot.style.border = borderStyle;
+                    dot.style.display = 'block';
+                } else {
+                    dot.style.display = 'none';
+                }
+            }
+            updateCrosshairDOMStyles();
+
+            const previewCanvas = document.getElementById('crosshairPreview');
+            const pCtx = previewCanvas.getContext('2d');
+            function drawCrosshairPreview() {
+                pCtx.clearRect(0, 0, 180, 180);
+                pCtx.save();
+                pCtx.translate(90, 90);
+                const s = saveData.settings;
+                const size = s.chSize;
+                const thick = s.chThick;
+                const gap = s.chGap;
+                const color = s.chColor;
+
+                pCtx.fillStyle = color;
+                pCtx.strokeStyle = '#000';
+                pCtx.lineWidth = s.chOutline ? 1 : 0;
+
+                const drawBar = (x, y, w, h) => {
+                    pCtx.fillRect(x, y, w, h);
+                    if (s.chOutline) pCtx.strokeRect(x, y, w, h);
+                };
+
+                drawBar(-thick / 2, -(gap + size), thick, size);
+                drawBar(-thick / 2, gap, thick, size);
+                drawBar(-(gap + size), -thick / 2, size, thick);
+                drawBar(gap, -thick / 2, size, thick);
+
+                if (s.chDot) {
+                    const dotSz = Math.max(2, thick);
+                    drawBar(-dotSz / 2, -dotSz / 2, dotSz, dotSz);
+                }
+                pCtx.restore();
+            }
+            drawCrosshairPreview();
+
+            arenaWrapper.addEventListener('pointermove', (e) => {
+                const rect = arenaWrapper.getBoundingClientRect();
+                if (saveData.settings.pointerLock && document.pointerLockElement === arenaWrapper) {
+                    const sens = saveData.settings.sensitivity;
+                    mouseX += e.movementX * sens;
+                    mouseY += e.movementY * sens;
+                    mouseX = Math.max(10, Math.min(rect.width - 10, mouseX));
+                    mouseY = Math.max(10, Math.min(rect.height - 10, mouseY));
+                } else {
+                    mouseX = e.clientX - rect.left;
+                    mouseY = e.clientY - rect.top;
+                }
+                customCrosshair.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+            });
+
+            document.addEventListener('pointerlockchange', () => {
+                if (document.pointerLockElement === arenaWrapper) {
+                    saveData.settings.pointerLock = true;
+                } else {
+                    saveData.settings.pointerLock = false;
+                }
+                updatePointerLockUI();
+            });
+
+            function updatePointerLockUI() {
+                const active = saveData.settings.pointerLock;
+                const icon = document.getElementById('pointerLockIcon');
+                const lbl = document.getElementById('pointerLockLabel');
+                const lobbyBtn = document.getElementById('btnLobbyPointerLock');
+
+                if (active) {
+                    icon.className = "fa-solid fa-lock";
+                    lbl.textContent = "Raw Lock: ON";
+                    if (lobbyBtn) {
+                        lobbyBtn.textContent = "Pointer Lock: ON";
+                        lobbyBtn.classList.add('active');
+                    }
+                } else {
+                    icon.className = "fa-solid fa-lock-open";
+                    lbl.textContent = "Raw Lock: OFF";
+                    if (lobbyBtn) {
+                        lobbyBtn.textContent = "Pointer Lock: OFF";
+                        lobbyBtn.classList.remove('active');
+                    }
+                }
+            }
+
+            document.getElementById('btnPointerLock').addEventListener('click', () => {
+                if (document.pointerLockElement === arenaWrapper) {
+                    document.exitPointerLock();
+                } else {
+                    arenaWrapper.requestPointerLock();
+                }
+            });
+
+            const lobbyPointerLockBtn = document.getElementById('btnLobbyPointerLock');
+            if (lobbyPointerLockBtn) {
+                lobbyPointerLockBtn.addEventListener('click', () => {
+                    saveData.settings.pointerLock = !saveData.settings.pointerLock;
+                    updatePointerLockUI();
+                    persistData();
+                });
+            }
+
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    currentMode = card.getAttribute('data-mode');
+                });
+            });
+
+            document.querySelectorAll('.duration-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    saveData.settings.duration = parseInt(btn.getAttribute('data-duration'), 10);
+                    persistData();
+                });
+            });
+
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    saveData.settings.size = btn.getAttribute('data-size');
+                    persistData();
+                });
+            });
+
+            const targetSwatches = document.querySelectorAll('#targetColorSwatches .swatch');
+            targetSwatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    targetSwatches.forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    saveData.settings.targetColor = swatch.getAttribute('data-color');
+                    persistData();
+                });
+            });
+
+            const chSwatches = document.querySelectorAll('#chColorSwatches .swatch');
+            chSwatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    chSwatches.forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    saveData.settings.chColor = swatch.getAttribute('data-color');
+                    updateCrosshairDOMStyles();
+                    drawCrosshairPreview();
+                    persistData();
+                });
+            });
+
+            const chSizeInput = document.getElementById('chSize');
+            const valChSize = document.getElementById('valChSize');
+            chSizeInput.value = saveData.settings.chSize;
+            valChSize.textContent = chSizeInput.value;
+            chSizeInput.addEventListener('input', () => {
+                saveData.settings.chSize = parseInt(chSizeInput.value, 10);
+                valChSize.textContent = chSizeInput.value;
+                updateCrosshairDOMStyles();
+                drawCrosshairPreview();
+                persistData();
+            });
+
+            const chThickInput = document.getElementById('chThick');
+            const valChThick = document.getElementById('valChThick');
+            chThickInput.value = saveData.settings.chThick;
+            valChThick.textContent = chThickInput.value;
+            chThickInput.addEventListener('input', () => {
+                saveData.settings.chThick = parseInt(chThickInput.value, 10);
+                valChThick.textContent = chThickInput.value;
+                updateCrosshairDOMStyles();
+                drawCrosshairPreview();
+                persistData();
+            });
+
+            const chGapInput = document.getElementById('chGap');
+            const valChGap = document.getElementById('valChGap');
+            chGapInput.value = saveData.settings.chGap;
+            valChGap.textContent = chGapInput.value;
+            chGapInput.addEventListener('input', () => {
+                saveData.settings.chGap = parseInt(chGapInput.value, 10);
+                valChGap.textContent = chGapInput.value;
+                updateCrosshairDOMStyles();
+                drawCrosshairPreview();
+                persistData();
+            });
+
+            const inputSens = document.getElementById('inputSensitivity');
+            const valSens = document.getElementById('valSensitivity');
+            inputSens.value = saveData.settings.sensitivity;
+            valSens.textContent = Number(inputSens.value).toFixed(2) + 'x';
+            inputSens.addEventListener('input', () => {
+                saveData.settings.sensitivity = parseFloat(inputSens.value);
+                valSens.textContent = Number(inputSens.value).toFixed(2) + 'x';
+                persistData();
+            });
+
+            const btnToggleDot = document.getElementById('btnToggleDot');
+            if (saveData.settings.chDot) btnToggleDot.classList.add('active');
+            else btnToggleDot.classList.remove('active');
+            btnToggleDot.addEventListener('click', () => {
+                saveData.settings.chDot = !saveData.settings.chDot;
+                btnToggleDot.classList.toggle('active', saveData.settings.chDot);
+                btnToggleDot.textContent = `Center Dot: ${saveData.settings.chDot ? 'ON' : 'OFF'}`;
+                updateCrosshairDOMStyles();
+                drawCrosshairPreview();
+                persistData();
+            });
+
+            const btnToggleOutline = document.getElementById('btnToggleOutline');
+            if (saveData.settings.chOutline) btnToggleOutline.classList.add('active');
+            else btnToggleOutline.classList.remove('active');
+            btnToggleOutline.addEventListener('click', () => {
+                saveData.settings.chOutline = !saveData.settings.chOutline;
+                btnToggleOutline.classList.toggle('active', saveData.settings.chOutline);
+                btnToggleOutline.textContent = `Outline: ${saveData.settings.chOutline ? 'ON' : 'OFF'}`;
+                updateCrosshairDOMStyles();
+                drawCrosshairPreview();
+                persistData();
+            });
+
+            document.getElementById('btnResetCrosshair').addEventListener('click', () => {
+                saveData.settings.chColor = '#00f0ff';
+                saveData.settings.chSize = 8;
+                saveData.settings.chThick = 2;
+                saveData.settings.chGap = 4;
+                saveData.settings.chDot = true;
+                saveData.settings.chOutline = true;
+                chSizeInput.value = 8; valChSize.textContent = '8';
+                chThickInput.value = 2; valChThick.textContent = '2';
+                chGapInput.value = 4; valChGap.textContent = '4';
+                btnToggleDot.classList.add('active'); btnToggleDot.textContent = 'Center Dot: ON';
+                btnToggleOutline.classList.add('active'); btnToggleOutline.textContent = 'Outline: ON';
+                updateCrosshairDOMStyles();
+                drawCrosshairPreview();
+                persistData();
+            });
+
+            const btnToggleMute = document.getElementById('btnToggleMute');
+            const muteIcon = document.getElementById('muteIcon');
+            btnToggleMute.addEventListener('click', () => {
+                sfx.muted = !sfx.muted;
+                muteIcon.className = sfx.muted ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high";
+            });
+
+            document.getElementById('btnOpenSettings').addEventListener('click', () => {
+                if (gameState === 'playing') return;
+                document.getElementById('settingsScreen').classList.remove('hidden');
+            });
+            document.getElementById('btnLobbySettings').addEventListener('click', () => {
+                document.getElementById('settingsScreen').classList.remove('hidden');
+            });
+            document.getElementById('btnCloseSettings').addEventListener('click', () => {
+                document.getElementById('settingsScreen').classList.add('hidden');
+            });
+
+            document.getElementById('btnStartGame').addEventListener('click', startCountdown);
+            document.getElementById('btnPlayAgain').addEventListener('click', startCountdown);
+            document.getElementById('btnBackToLobby').addEventListener('click', showLobby);
+
+            function showLobby() {
+                gameState = 'lobby';
+                document.getElementById('resultsScreen').classList.add('hidden');
+                document.getElementById('lobbyScreen').classList.remove('hidden');
+                document.getElementById('btnStopRound').style.display = 'none';
+                customCrosshair.style.display = 'none';
+                canvas.classList.remove('playing');
+                arenaWrapper.classList.remove('playing');
+                updateBestScoresUI();
+            }
+
+            function startCountdown() {
+                document.getElementById('lobbyScreen').classList.add('hidden');
+                document.getElementById('resultsScreen').classList.add('hidden');
+                gameState = 'countdown';
+                customCrosshair.style.display = 'block';
+                canvas.classList.add('playing');
+                arenaWrapper.classList.add('playing');
+                document.getElementById('btnStopRound').style.display = 'inline-flex';
+
+                const countdownOverlay = document.getElementById('countdownOverlay');
+                const countdownText = document.getElementById('countdownText');
+                countdownOverlay.classList.remove('hidden');
+
+                let count = 3;
+                countdownText.textContent = count;
+                sfx.playBeep(false);
+
+                const countInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdownText.textContent = count;
+                        sfx.playBeep(false);
+                    } else if (count === 0) {
+                        countdownText.textContent = 'GO!';
+                        sfx.playBeep(true);
+                    } else {
+                        clearInterval(countInterval);
+                        countdownOverlay.classList.add('hidden');
+                        beginPlaying();
+                    }
+                }, 1000);
+            }
+
+            function getTargetRadius() {
+                const sizeType = saveData.settings.size;
+                if (currentMode === 'headshot') return sizeType === 'small' ? 14 : sizeType === 'medium' ? 22 : 30;
+                if (currentMode === 'microflick') return sizeType === 'small' ? 12 : sizeType === 'medium' ? 18 : 26;
+                return sizeType === 'small' ? 22 : sizeType === 'medium' ? 32 : 44;
+            }
+
+            function spawnTarget(forceIndex = null) {
+                const rect = canvas.getBoundingClientRect();
+                const radius = getTargetRadius();
+                const margin = radius + 30;
+                const x = margin + Math.random() * (rect.width - margin * 2);
+                const y = margin + Math.random() * (rect.height - margin * 2);
+
+                const newT = {
+                    x, y, radius,
+                    spawnTime: performance.now(),
+                    isHeadshot: currentMode === 'headshot' && Math.random() < 0.45,
+                    vx: currentMode === 'tracking' ? (Math.random() > 0.5 ? 2.5 : -2.5) : 0,
+                    vy: 0
+                };
+
+                if (forceIndex !== null && forceIndex < targets.length) {
+                    targets[forceIndex] = newT;
+                } else {
+                    targets.push(newT);
+                }
+            }
+
+            function beginPlaying() {
+                gameState = 'playing';
+                score = 0;
+                shotsFired = 0;
+                shotsHit = 0;
+                streak = 0;
+                bestStreak = 0;
+                reactionTimes = [];
+                timeRemaining = saveData.settings.duration;
+                targets = [];
+
+                if (currentMode === 'gridshot') {
+                    for (let i = 0; i < 3; i++) spawnTarget();
+                } else if (currentMode === 'tracking') {
+                    spawnTarget();
+                } else {
+                    spawnTarget();
+                }
+
+                lastSpawnTime = performance.now();
+
+                document.getElementById('hudTimer').textContent = timeRemaining.toFixed(1);
+                document.getElementById('hudScore').textContent = '0';
+                document.getElementById('hudAccuracy').textContent = '100%';
+                document.getElementById('hudStreak').textContent = '0';
+
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeRemaining -= 0.1;
+                    document.getElementById('hudTimer').textContent = Math.max(0, timeRemaining).toFixed(1);
+                    if (timeRemaining <= 0) {
+                        endRound();
+                    }
+                }, 100);
+            }
+
+            canvas.addEventListener('pointerdown', (e) => {
+                if (gameState !== 'playing') return;
+                shotsFired++;
+
+                const rect = canvas.getBoundingClientRect();
+                const clickX = mouseX;
+                const clickY = mouseY;
+
+                let hitIndex = -1;
+                let minDist = Infinity;
+
+                targets.forEach((t, idx) => {
+                    const dist = Math.hypot(clickX - t.x, clickY - t.y);
+                    if (dist <= t.radius && dist < minDist) {
+                        minDist = dist;
+                        hitIndex = idx;
+                    }
+                });
+
+                if (hitIndex !== -1) {
+                    shotsHit++;
+                    streak++;
+                    if (streak > bestStreak) bestStreak = streak;
+
+                    const t = targets[hitIndex];
+                    const reaction = performance.now() - t.spawnTime;
+                    reactionTimes.push(reaction);
+
+                    if (t.isHeadshot) {
+                        score += 300;
+                        sfx.playHeadshot();
+                    } else {
+                        score += 100;
+                        sfx.playHit(streak);
+                    }
+
+                    if (currentMode === 'gridshot') {
+                        spawnTarget(hitIndex);
+                    } else if (currentMode === 'tracking') {
+                        // persistent target
+                    } else {
+                        spawnTarget(hitIndex);
+                    }
+                } else {
+                    streak = 0;
+                    sfx.playMiss();
+                    if (currentMode === 'headshot') {
+                        score = Math.max(0, score - 50);
+                    }
+                }
+
+                const acc = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 100;
+                document.getElementById('hudScore').textContent = score;
+                document.getElementById('hudAccuracy').textContent = acc + '%';
+                document.getElementById('hudStreak').textContent = streak;
+            });
+
+            function endRound() {
+                gameState = 'results';
+                clearInterval(timerInterval);
+                document.getElementById('btnStopRound').style.display = 'none';
+                customCrosshair.style.display = 'none';
+                canvas.classList.remove('playing');
+                arenaWrapper.classList.remove('playing');
+
+                const prevBest = saveData.highScores[currentMode] || 0;
+                const isNewBest = score > prevBest;
+                if (isNewBest) {
+                    saveData.highScores[currentMode] = score;
+                    persistData();
+                }
+
+                const acc = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0;
+                const duration = saveData.settings.duration;
+                const kps = (shotsHit / duration).toFixed(2);
+                const avgReaction = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : 0;
+
+                document.getElementById('resultModeTitle').textContent = `${currentMode.toUpperCase()} Debrief`;
+                document.getElementById('resScore').textContent = score;
+                document.getElementById('resAccuracy').textContent = acc + '%';
+                document.getElementById('resKps').textContent = kps;
+                document.getElementById('resReaction').textContent = avgReaction + 'ms';
+                document.getElementById('resultBestScore').textContent = saveData.highScores[currentMode];
+
+                const newRecordBadge = document.getElementById('newRecordBadge');
+                if (isNewBest) newRecordBadge.style.display = 'inline-block';
+                else newRecordBadge.style.display = 'none';
+
+                let rankName = 'IRON I';
+                let rankColor = '#8b9bb4';
+                if (score >= 1200) { rankName = 'RADIANT'; rankColor = '#ff4655'; }
+                else if (score >= 900) { rankName = 'IMMORTAL III'; rankColor = '#f5b942'; }
+                else if (score >= 700) { rankName = 'ASCENDANT III'; rankColor = '#00f0ff'; }
+                else if (score >= 500) { rankName = 'DIAMOND I'; rankColor = '#2ee59d'; }
+                else if (score >= 350) { rankName = 'PLATINUM II'; rankColor = '#b57cff'; }
+
+                const rankEl = document.getElementById('resultRankName');
+                rankEl.textContent = rankName;
+                rankEl.style.color = rankColor;
+
+                document.getElementById('resultsScreen').classList.remove('hidden');
+            }
+
+            document.getElementById('btnStopRound').addEventListener('click', () => {
+                if (gameState === 'playing') endRound();
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && gameState === 'playing') {
+                    endRound();
+                }
+            });
+
+            function gameLoop() {
+                const rect = canvas.getBoundingClientRect();
+                ctx.clearRect(0, 0, rect.width, rect.height);
+
+                if (gameState === 'playing') {
+                    if (currentMode === 'tracking' && targets.length > 0) {
+                        const t = targets[0];
+                        t.x += t.vx;
+                        if (t.x - t.radius < 20 || t.x + t.radius > rect.width - 20) {
+                            t.vx *= -1;
+                        }
+                    }
+
+                    targets.forEach(t => {
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = t.isHeadshot ? '#f5b942' : saveData.settings.targetColor;
+                        ctx.shadowColor = ctx.fillStyle;
+                        ctx.shadowBlur = 14;
+                        ctx.fill();
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = '#fff';
+                        ctx.stroke();
+
+                        if (t.isHeadshot) {
+                            ctx.beginPath();
+                            ctx.arc(t.x, t.y, t.radius * 0.35, 0, Math.PI * 2);
+                            ctx.fillStyle = '#ff4655';
+                            ctx.fill();
+                        }
+                        ctx.restore();
+                    });
+                }
+
+                requestAnimationFrame(gameLoop);
+            }
+            requestAnimationFrame(gameLoop);
+        })();
+    </script>
+</body>
+</html>
